@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <stddef.h>
 //Task 1 (Pointers & Memory): Bóc tách gói tin cấu hình
 void parse_config(const uint8_t *config_packet, int16_t *high_threshold) {
     if (config_packet == NULL||high_threshold == NULL){
-        return 0;
+        return;
     }
     //config_packet[0]=LSB=00000000 abcdefgh
     //config_packet[1] (dịch trái 8 bit)=MSB=mnefghit 00000000
@@ -24,7 +25,7 @@ void control_output(uint8_t *control_reg,
                     uint8_t fan_enable,
                     uint8_t alarm_enable){
                         if (control_reg==NULL){
-                            return 0;
+                            return;
                         }
                         if (fan_enable == 1){
                             *control_reg |= (1<<0); //Bật bit0 lên 1
