@@ -1,0 +1,17 @@
+Task 1: Bản chất các chế độ GPIO
+1.1. Hoạt động của Transistor trong chế độ Push-Pull:
+
+Mức logic 1 (3.3V): Transistor PMOS được kích dẫn (ON), Transistor NMOS bị ngắt (OFF). Dòng điện đi từ nguồn VDD qua PMOS ra chân GPIO.
+
+Mức logic 0 (0V): Transistor PMOS bị ngắt (OFF), Transistor NMOS được kích dẫn (ON). Chân GPIO được nối thẳng xuống VSS (GND).
+
+1.2. Chế độ Input Pull-up và hiện tượng Floating:
+
+Khi nào dùng Input Pull-up: Cần thiết khi giao tiếp với các thiết bị tạo ra trạng thái hở mạch (High-Z) khi không hoạt động, điển hình nhất là nút nhấn (chỉ nối xuống GND khi bấm) hoặc các bus giao tiếp như I2C.
+
+Hiện tượng Floating (Thả nổi): Nếu để chân Input không kết nối và không có trở kéo, ngõ vào của cổng logic CMOS bên trong vi điều khiển (vốn có trở kháng cực kỳ cao) sẽ hoạt động như một ăng-ten. Nó sẽ thu nhiễu điện từ từ môi trường, làm cho giá trị thanh ghi đọc về (IDR) nhảy liên tục giữa 0 và 1 một cách ngẫu nhiên.
+
+Task 2: Tầm quan trọng của Xung nhịp (Clock)
+Lý do tắt Clock mặc định: Khác với các dòng vi điều khiển cơ bản thường cấp xung nhịp toàn cục, kiến trúc lõi ARM trên STM32 quản lý năng lượng rất khắt khe. Việc ngắt xung nhịp mặc định cho tất cả ngoại vi trên bus APB/AHB giúp chip tiết kiệm điện năng tối đa.
+
+Hậu quả khi quên bật Clock: Nếu không cấp xung nhịp, ngoại vi đó coi như bị "đóng băng" ở mức phần cứng. Mọi lệnh ghi (Write) vào thanh ghi cấu hình (như CRH, CRL, ODR) đều vô tác dụng, và lệnh đọc (Read) sẽ trả về giá trị rác hoặc 0. Trình biên dịch không báo lỗi, code vẫn chạy qua nhưng phần cứng hoàn toàn không hoạt động.
