@@ -1,0 +1,22 @@
+Task 1: Phân tích trình tự và công cụ của Toolchain
+1.1: Công dụng chính của các công cụ:
+•	CMake: Đọc các cấu hình dự án ở mức cao và sinh ra các kịch bản build (build files) độc lập với nền tảng.
+•	Ninja: Hệ thống quản lý build siêu tốc, đọc các kịch bản do CMake sinh ra để điều phối tiến trình biên dịch.
+•	arm-none-eabi-gcc: Trình biên dịch (Compiler) cốt lõi, chịu trách nhiệm dịch mã nguồn C/C++ thành mã máy dành riêng cho kiến trúc ARM.
+•	STM32_Programmer_CLI: Công cụ dòng lệnh giao tiếp với mạch nạp phần cứng để nạp file nhị phân vào bộ nhớ Flash của vi điều khiển.
+1.2: Trình tự logic của chuỗi công cụ:
+•	Luồng chạy: CMake -> Ninja -> arm-none-eabi-gcc -> STM32_Programmer_CLI
+•	Đầu tiên, CMake cấu hình dự án và chuẩn bị kịch bản cho Ninja. Kế tiếp, Ninja dựa vào kịch bản này để gọi arm-none-eabi-gcc dịch code C thành mã máy. Sau khi có file nhị phân hoàn chỉnh, công cụ STM32_Programmer_CLI sẽ chạy cuối cùng để nạp chương trình đó xuống chip.
+Task 2: Phân bổ vai trò của Linker và Ninja
+2.1: Vai trò của linker và sự khác biệt của file ".bin": Chúng ta chưa thể nạp ngay file ".o" vì chúng chỉ là các mảnh mã máy rời rạc, chưa được cấp phát địa chỉ bộ nhớ thực tế và chưa được kết nối các hàm/biến gọi chéo giữa nhiều file. File final ".bin" do linker tạo ra là một khối dữ liệu nhị phân nguyên thuỷ (raw binary) đã được định vị địa chỉ bộ nhớ tuyệt đối, hoàn toàn sẵn sàng để sao chép thẳng lên bộ nhớ vi điều khiển.
+2.2: Cơ chế Build tăng dần của Ninja: Build tăng dần giúp tiết kiệm năng lượng và thời gian bằng cách bỏ qua những file mã nguồn không có sự thay đổi. Ninja làm được điều này bằng cách kiểm tra timestamp của file nguồn ".c" và các file header đi kèm. Nếu timestamp của file ".c" mới hơn timestamp của file ".o" tương ứng đã build trước đó, Ninja mới ra lệnh cho Compiler biên dịch lại file đó.
+Task 3: Phân tích phân vùng VMA/LMA và Startup Code
+3.1: Sự khác nhau giữa LMA và VMA của vùng ".data":
+•	LMA (Load Memory Address): Là địa chỉ vật lý trên bộ nhớ không biến đổi (Flash) để lưu trữ giá trị ban đầu của biến khi nạp chương trình.
+•	VMA: Là địa chỉ trên RAM nơi chương trình thực tế đọc/ghi các biến đó khi vi điều khiển hoạt động.
+Vùng ".data" cần cả 2 vì RAM sẽ mất dữ liệu khi cúp điện, do đó giá trị khởi tạo phải được lưu giữ an toàn ở LMA (Flash). Khi chip chạy, nó cần thao tác với dữ liệu ở tốc độ cao và thay được giá trị, nên biến phải tồn tại ở VMA (RAM).
+3.2: Hệ quả khi quên chép dữ liệu từ LMA sang VMA: Nếu Reset_Handler bỏ qua bước này, các biến toàn cục trên RAM sẽ chứa toàn giá trị rác ngẫu nhiên. Lỗi này dẫn đến sai logic hệ thống nghiêm trọng ngay khi khởi động. Quá trình này hoàn toàn tương đồng với việc người lập trình phải chủ động viết vòng lặp sử dụng con trỏ Z và thanh ghi Y làm bộ đếm để di chuyển các khối dữ liệu trong Assembly: nếu không có thao tác chép khối đó, vùng nhớ đích sẽ không có dữ liệu hợp lệ để xử lý.
+Task 4: Khai báo các câu lệnh điều khiển hệ thống
+4.1: Câu lệnh CMake: cmake -G Ninja -B build
+4.2: Câu lệnh Ninja: ninja -C build
+
