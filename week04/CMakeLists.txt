@@ -1,43 +1,77 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
-# 1. Định nghĩa hệ thống nhúng trước khi gọi lệnh project
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR arm)
+#
+# This file is generated only once,
+# and is not re-generated if converter is called multiple times.
+#
+# User is free to modify the file as much as necessary
+#
 
-# 2. Bỏ qua bước kiểm tra C Compiler của CMake
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-
-# 3. Định nghĩa dự án
-project(week04 C ASM)
-
-
-add_compile_definitions(STM32F103xB)
-
-# 4. Các cờ biên dịch vào dự án
-add_compile_options(-mcpu=cortex-m3 -mthumb --specs=nosys.specs)
+# Setup compiler settings
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
 
-add_link_options(-mcpu=cortex-m3 -mthumb --specs=nosys.specs -T ${CMAKE_SOURCE_DIR}/STM32F103C8Tx_FLASH.ld)
+# Define the build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
 
-add_executable(${PROJECT_NAME} "")
+# Set the project name
+set(CMAKE_PROJECT_NAME week04)
+# Include toolchain file
+include("cmake/gcc-arm-none-eabi.cmake")
 
-target_sources(${PROJECT_NAME} PRIVATE
+# Enable compile command to ease indexing with e.g. clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+# Core project settings
+project(${CMAKE_PROJECT_NAME})
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
+# Enable CMake support for ASM and C languages
+enable_language(C ASM)
+
+# Create an executable object type
+add_executable(${CMAKE_PROJECT_NAME})
+
+# Add STM32CubeMX generated sources
+add_subdirectory(cmake/stm32cubemx)
+
+# Link directories setup
+target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined library search paths
+)
+
+# Add sources to executable
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Task_5.c
-    stm32f1xx_hal.c
-    stm32f1xx_hal_gpio.c
-    stm32f1xx_hal_rcc.c
-    stm32f1xx_hal_rcc_ex.c
-    stm32f1xx_hal_cortex.c
-    stm32f1xx_hal_flash.c
-    stm32f1xx_hal_flash_ex.c
-    system_stm32f1xx.c
-    startup_stm32f103xb.s
+    
 )
 
-# Đảm bảo thư mục hiện hành chứa file stm32f1xx_hal_conf.h
-target_include_directories(${PROJECT_NAME} PRIVATE .)
-# Yêu cầu objcopy tự động tạo file .hex và .bin sau khi build thành công
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND arm-none-eabi-objcopy -O ihex $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.hex
-    COMMAND arm-none-eabi-objcopy -O binary $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.bin
+# Add include paths
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined include paths
 )
+
+# Add project symbols (macros)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined symbols
+)
+
+# Remove wrong libob.a library dependency when using cpp files
+list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
+
+# Add linked libraries
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    stm32cubemx
+
+    # Add user defined libraries
+)
+target_include_directories(${PROJECT_NAME} PRIVATE .)
+#Tự động sinh file .hex và .bin sau khi build xong
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.bin
+    COMMENT "Building HEX and BIN files")

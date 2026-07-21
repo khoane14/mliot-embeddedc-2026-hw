@@ -1,4 +1,4 @@
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
 void SystemClock_Config(void);
 
@@ -18,7 +18,6 @@ int main(void) {
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     // BƯỚC 3: Cấu hình 2 chân Hàng (PA2, PA3) và 4 chân LED (PA4-PA7) làm ngõ ra
-    // Gom chung khởi tạo vì chúng có cùng tính chất Output Push-Pull
     GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -79,8 +78,4 @@ void SystemClock_Config(void) {
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
     HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
-}
-
-void SysTick_Handler(void) {
-    HAL_IncTick();
 }

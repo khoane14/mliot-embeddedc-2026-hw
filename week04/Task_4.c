@@ -1,4 +1,4 @@
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
 uint8_t button_pressed = 0;
 
@@ -28,11 +28,11 @@ int main(void) {
 
     while (1) {
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) {
-            HAL_Delay(20); 
+            HAL_Delay(20); // Chống dội phím
             
             if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) {
                 if (button_pressed == 0) {
-                    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Đảo LED ở chân PC13
+                    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Đảo trạng thái LED ở chân PC13
                     button_pressed = 1;
                 }
             }
@@ -58,8 +58,4 @@ void SystemClock_Config(void) {
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
     HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
-}
-
-void SysTick_Handler(void) {
-    HAL_IncTick();
 }
