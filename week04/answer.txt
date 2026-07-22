@@ -15,3 +15,5 @@ Task 2: Tầm quan trọng của Xung nhịp (Clock)
 Lý do tắt Clock mặc định: Khác với các dòng vi điều khiển cơ bản thường cấp xung nhịp toàn cục, kiến trúc lõi ARM trên STM32 quản lý năng lượng rất khắt khe. Việc ngắt xung nhịp mặc định cho tất cả ngoại vi trên bus APB/AHB giúp chip tiết kiệm điện năng tối đa.
 
 Hậu quả khi quên bật Clock: Nếu không cấp xung nhịp, ngoại vi đó coi như bị "đóng băng" ở mức phần cứng. Mọi lệnh ghi (Write) vào thanh ghi cấu hình (như CRH, CRL, ODR) đều vô tác dụng, và lệnh đọc (Read) sẽ trả về giá trị rác hoặc 0. Trình biên dịch không báo lỗi, code vẫn chạy qua nhưng phần cứng hoàn toàn không hoạt động.
+Link video minh chứng: https://drive.google.com/drive/folders/1BpndCzd1QHTSKZYfjQUPGdISwcSuPHre?usp=sharing
+Do Task_5 e không biết sai ở đâu mà mạch ko test đc, nếu tìm ra lỗi e sẽ update lại sau.

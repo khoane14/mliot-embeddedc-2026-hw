@@ -25,23 +25,25 @@ int main(void) {
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     while (1) {
-        // Tắt toàn bộ 4 LED trước khi bắt đầu vòng quét mới
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7, GPIO_PIN_RESET);
-
         // ==========================================
         // QUÉT HÀNG 1: Kéo PA2 xuống 0, giữ PA3 ở 1
         // ==========================================
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-        HAL_Delay(5); // Delay nhỏ để ổn định điện áp trên đường dây
+        HAL_Delay(5); 
 
-        // Đọc Cột 1 (Phím 1)
+        // Đọc Cột 1 (Phím 1) -> Điều khiển LED 1 (PA4)
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) {
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // Bật LED 1
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+        } else {
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
         }
-        // Đọc Cột 2 (Phím 2)
+        
+        // Đọc Cột 2 (Phím 2) -> Điều khiển LED 2 (PA5)
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == GPIO_PIN_RESET) {
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); // Bật LED 2
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); 
+        } else {
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
         }
 
         // ==========================================
@@ -51,13 +53,18 @@ int main(void) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
         HAL_Delay(5);
 
-        // Đọc Cột 1 (Phím 3)
+        // Đọc Cột 1 (Phím 3) -> Điều khiển LED 3 (PA6)
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) {
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET); // Bật LED 3
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET); 
+        } else {
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
         }
-        // Đọc Cột 2 (Phím 4)
+        
+        // Đọc Cột 2 (Phím 4) -> Điều khiển LED 4 (PA7)
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == GPIO_PIN_RESET) {
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET); // Bật LED 4
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET); 
+        } else {
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
         }
     }
 }
